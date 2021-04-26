@@ -32,7 +32,7 @@ class Config(object):
 
     CLIENT_ID = "85953151-a44e-4eea-8efa-b8c9218cbb86"
 
-    REDIRECT_PATH = "//https://2ndcms.azurewebsites.net/signin-oidc"  # Used to form an absolute URL; must match to app's redirect_uri set in AAD
+    REDIRECT_PATH = "//2ndcms.azurewebsites.net/signin-oidc"  # Used to form an absolute URL; must match to app's redirect_uri set in AAD
 
     # You can find the proper permission names from this document
     # https://docs.microsoft.com/en-us/graph/permissions-reference
