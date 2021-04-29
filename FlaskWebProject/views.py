@@ -92,7 +92,7 @@ def authorized():
     if request.args.get('state') != session.get("state"):
         return redirect(url_for("home"))  # No-OP. Goes back to Index page
     if "error" in request.args:  # Authentication/Authorization failure
-        app.logger.info('MSAL login failed: Invalid username or password, {}'.format(form.username.data))
+        app.logger.info('MSAL login failed: Invalid username or password, {}'.format(user.username))
         return render_template("auth_error.html", result=request.args)
     if request.args.get('code'):
         cache = _load_cache()
@@ -108,7 +108,7 @@ def authorized():
         # Here, we'll use the admin username for anyone who is authenticated by MS
         user = User.query.filter_by(username="admin").first()
         login_user(user)
-        app.logger.info('MSAL login successful: User logged in, {}'.format(form.username.data))
+        app.logger.info('MSAL login successful: User logged in, {}'.format(user.username))
         _save_cache(cache)
     return redirect(url_for('home'))
 
