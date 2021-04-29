@@ -76,10 +76,10 @@ def login():
         if user is None or not user.check_password(form.password.data):
             app.logger.info('login failed: Invalid username or password, {}'.format(form.username.data))
             flash('Invalid username or password')
-            app.logger.warning('Invalid login attempt username'.format(form.username.data))
+            app.logger.warning('Invalid login attempt username', user.username)
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
-        app.logger.info('Admin logged in successfully'.format(form.username.data))
+        app.logger.info('Admin logged in successfully', user.username)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('home')
