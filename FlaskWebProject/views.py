@@ -12,6 +12,14 @@ from flask_login import current_user, login_user, logout_user, login_required
 from FlaskWebProject.models import User, Post
 import msal
 import uuid
+import logging
+from flask import Flask
+
+wsgi_app = app.wsgi_app
+app.logger.setLevel(logging.INFO)
+streamHandler = logging.StreamHandler()
+streamHandler.setLevel(logging.INFO)
+app.logger.addHandler(streamHandler)
 
 imageSourceUrl = 'https://'+ app.config['BLOB_ACCOUNT']  + '.blob.core.windows.net/' + app.config['BLOB_CONTAINER']  + '/'
 
@@ -68,9 +76,10 @@ def login():
         if user is None or not user.check_password(form.password.data):
             app.logger.info('login failed: Invalid username or password, {}'.format(form.username.data))
             flash('Invalid username or password')
+            app.logger.warning('Invalid login attempt username'.format(form.username.data))
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
-        app.logger.info('login successful: User logged in, {}'.format(form.username.data))
+        app.logger.info('Admin logged in successfully'.format(form.username.data))
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('home')
@@ -84,6 +93,7 @@ def authorized():
     if request.args.get('state') != session.get("state"):
         return redirect(url_for("home"))  # No-OP. Goes back to Index page
     if "error" in request.args:  # Authentication/Authorization failure
+        app.logger.info('MSAL Login failed', user.username)
         return render_template("auth_error.html", result=request.args)
     if request.args.get('code'):
         cache = _load_cache()
@@ -99,7 +109,7 @@ def authorized():
         # Here, we'll use the admin username for anyone who is authenticated by MS
         user = User.query.filter_by(username="admin").first()
         login_user(user)
-        app.logger.info('login successful: Microsoft account login')
+        app.logger.info('Admin logged in with MSAL', user.username)
         _save_cache(cache)
     return redirect(url_for('home'))
 
